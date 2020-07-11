@@ -1,4 +1,0 @@
-imutils
-cv2
-argparse
-numpy
