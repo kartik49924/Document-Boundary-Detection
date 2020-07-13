@@ -1,0 +1,8 @@
+gdown==3.11.0
+imutils==0.5.3
+numexpr==2.6.4
+numpy==1.18.5
+opencv-python==4.1.2.30
+opencv-python-headless==4.1.2.30
+
+
