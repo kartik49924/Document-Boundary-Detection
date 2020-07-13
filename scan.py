@@ -71,6 +71,18 @@ def four_point_transform(image, pts):
 	# return the warped image
 	return warped
 
+def scale_contour(cnt, scale):
+    M = cv2.moments(cnt)
+    cx = int(M['m10']/M['m00'])
+    cy = int(M['m01']/M['m00'])
+
+    cnt_norm = cnt - [cx, cy]
+    cnt_scaled = cnt_norm * scale
+    cnt_scaled = cnt_scaled + [cx*scale, cy*scale]
+    cnt_scaled = cnt_scaled.astype(np.int32)
+
+    return cnt_scaled
+
 
 
 def get_edges(image_list):
@@ -84,7 +96,10 @@ def get_edges(image_list):
 		# and resize it easier for compute and viewing
 		ratio = image.shape[0] / 500.0
 		orig = image.copy()
+		#print(image.shape)
 		image = imutils.resize(image, height = 500)
+		#print(image.shape)
+		#cv2.imshow('My name is kartik',image)
 		#image = cv2.resize(image, (image.shape[0]//10,image.shape[1]//10))
 
 		### convert the image to grayscale, blur it, and find edges in the image
@@ -144,13 +159,17 @@ def get_edges(image_list):
 			
 		# show the contour (outline) 
 		print("STEP 2: Finding Boundary")
-
-		cv2.drawContours(image, [screenCnt], -1, (0, 255, 0), 2)
-		orig=cv2.resize(orig,(image.shape[1],image.shape[0]))
+		#cv2.drawContours(image, [screenCnt], -1, (0, 255, 0), 2)
+		orig1=orig.copy()
+		cv2.drawContours(orig1, [scale_contour(screenCnt,ratio)], -1, (0,0,255), 10)
+		#cv2.imshow('mum',orig1)
+		#cv2.imshow()
+		#orig=cv2.resize(orig,(image.shape[1],image.shape[0]))
 		#print(orig.shape,image.shape)
-		#cv2.imshow("Boundary", np.hstack((image,orig)))
-		print(imag)
-		cv2.imwrite('./output_images/{}_output.jpg'.format(imag[-7:-4]),image)
+		#cv2.imshow("Boundary", cv2.resize(np.hstack((orig1,orig)),(orig1.shape[1]//3,orig1.shape[0]//6))) # to help in visualization
+		#print(imag)
+		#image=np.hstack((image,orig))
+		cv2.imwrite('./output_images/{}_output.jpg'.format(imag[-7:-4]),orig1)
 		cv2.waitKey(0)
 		cv2.destroyAllWindows()
 
@@ -160,7 +179,7 @@ ap.add_argument("-i", "--image", required = False,
 	help = "Path to the image to be scanned")
 args = vars(ap.parse_args())
 imag=[]
-print(args)
+#print(args)
 if args['image'] is not None:
 	imag.append(args['image'])
 else:
